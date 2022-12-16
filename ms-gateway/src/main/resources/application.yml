@@ -1,0 +1,41 @@
+# Configuraciones del servidor
+server:
+  port: 8080
+# Configuraciones de eureka
+eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+# Configuraciones de spring cloud
+spring:
+  application:
+    name: ms-gateway
+  security:
+    oauth2:
+      client:
+        provider:
+          api-gateway-service:
+            issuer-uri: http://localhost:8082/realms/digitalhouse
+        registration:
+          api-gateway-service:
+            provider: api-gateway-service
+            client-id: aula_pre_prova
+            client-secret: xZgDLD8bjXEhHkAJxO8BxH5hPcoxIZWA
+            authorization-grant-type: authorization_code
+            redirect-uri: 'http://localhost:8080/login/oauth2/code/keycloak'
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+      routes:
+        - id: ms-bill
+          uri: lb://ms-bill
+          predicates:
+             - Path=/users/**
+          filters:
+            - StripPrefix=2
